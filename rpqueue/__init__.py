@@ -534,10 +534,14 @@ class Task(object):
 
         if kwargs.pop('execute_inline_now', None):
             # allow for testing/debugging to execute the task immediately
-            et([None, self.name, args, kwargs, 0], conn)
-            return
+            if delay:
+                log_handler.warn('execute_inline_now provided, delay ignored')
+            taskid = taskid or str(uuid.uuid4())
+            et([taskid, self.name, args, kwargs, 0], conn)
+        else:
+            taskid = ec(conn, _queue, self.name, args, kwargs, delay,
+                        taskid=taskid)
 
-        taskid = ec(conn, _queue , self.name, args, kwargs, delay, taskid=taskid)
         return enq(self.name, taskid, _queue, self)
 
     def retry(self, *args, **kwargs):

@@ -223,5 +223,14 @@ class TestRPQueue(unittest.TestCase):
         time.sleep(1)
         self.assertEquals(t.result, None)
 
+    def test_execute_inline(self):
+        task1.execute(1, execute_inline_now=True)
+        self.assertEquals(saw[0], 1)
+
+    def test_execute_inline_results(self):
+        t = result_test.execute(5, execute_inline_now=True)
+        self.assertEquals(t.result, 5)
+        self.assertEquals(t.status, 'done')
+
 if __name__ == '__main__':
     unittest.main()
